@@ -1,0 +1,57 @@
+## Utworzenie tabeli "Products"
+
+CREATE TABLE Products (
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(100),
+    category VARCHAR(50),
+    stock_quantity INT DEFAULT 0
+);
+
+## Utworzenie tabeli Inventory_movements
+
+CREATE TABLE Inventory_Movements (
+    movement_id INT PRIMARY KEY,
+    product_id INT,
+    movement_type ENUM('PRZYJĘCIE', 'WYDANIE'),
+    quantity INT,
+    movement_date DATE,
+    FOREIGN KEY (product_id) REFERENCES Products(product_id)
+);
+
+##Procedura składowana- aktualizacja stanu magazynowego
+
+DELIMITER $$
+
+CREATE PROCEDURE UpdateInventory(
+    IN productID INT,
+    IN movementType ENUM('PRZYJĘCIE', 'WYDANIE'),
+    IN qty INT
+)
+BEGIN
+    -- Wstawienie nowego ruchu magazynowego do tabeli Inventory_Movements
+    INSERT INTO Inventory_Movements (product_id, movement_type, quantity, movement_date)
+    VALUES (productID, movementType, qty, CURDATE());
+    
+    -- Aktualizacja stanu magazynowego na podstawie typu operacji
+    IF movementType = 'PRZYJĘCIE' THEN
+        UPDATE Products
+        SET stock_quantity = stock_quantity + qty
+        WHERE product_id = productID;
+    ELSEIF movementType = 'WYDANIE' THEN
+        UPDATE Products
+        SET stock_quantity = stock_quantity - qty
+        WHERE product_id = productID;
+    END IF;
+END $$
+
+DELIMITER ;
+
+## Przykładowe użycie- przyjęcie 50 sztuk produktu o ID = 1
+
+CALL UpdateInventory(1, 'PRZYJĘCIE', 50);
+
+## Przykładowe użycie- Wydanie 20 sztuk produktu o ID = 1
+
+CALL UpdateInventory(1, 'WYDANIE', 20);
+
+
