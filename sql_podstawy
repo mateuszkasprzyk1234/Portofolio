@@ -1,0 +1,11 @@
+# Analiza miesięcznej sprzedaży
+  
+SELECT 
+    MONTH(sale_date) AS Month,
+    SUM(sales_amount) AS TotalSales
+FROM 
+    Sales
+GROUP BY 
+    MONTH(sale_date)
+ORDER BY 
+    Month;
