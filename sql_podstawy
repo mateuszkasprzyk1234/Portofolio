@@ -1,8 +1,8 @@
 # Analiza miesięcznej sprzedaży
   
 SELECT 
-    MONTH(sale_date) AS Month,
-    SUM(sales_amount) AS TotalSales
+    MONTH(sale_date) AS miesiac_sprzedaz
+    SUM(sales_amount) AS Suma_sprzedazy
 FROM 
     Sales
 GROUP BY 
